@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>九巴即時到站預報</title>
+  <title>九巴即時到站預報 🚌 Pro</title>
   <style>
     :root {
       --kmb-red: #e53935;
-      --bg-color: #f8f9fa;
-      --card-bg: #ffffff;
-      --text-main: #212529;
-      --text-sub: #6c757d;
-      --border-color: #f1f3f5;
-      --badge-bg: #f1f3f5;
-      --badge-text: #212529;
-      --shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-main: #e0e0e0;
+      --text-sub: #a0a0a0;
+      --border-color: #2c2c2c;
+      --badge-bg: #2c2c2c;
+      --badge-text: #ffffff;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
       --star-color: #ffd700;
     }
 
@@ -35,32 +35,26 @@
       --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
 
-    * {
-      box-sizing: border-box;
-      transition: background-color 0.3s, color 0.3s;
-    }
+    * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-main);
       margin: 0;
-      padding: 16px;
+      padding: 20px 16px;
       display: flex;
       justify-content: center;
     }
 
-    .container {
-      width: 100%;
-      max-width: 520px;
-    }
+    .container { width: 100%; max-width: 1100px; }
 
     header {
       background: var(--card-bg);
-      padding: 16px 20px;
+      padding: 20px;
       border-radius: 16px;
       box-shadow: var(--shadow);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       position: sticky;
       top: 10px;
       z-index: 100;
@@ -77,100 +71,126 @@
       margin: 0;
       font-size: 1.4rem;
       font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .theme-toggle {
-      background: none;
-      border: none;
-      font-size: 1.2rem;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle, .btn-help {
+      background: var(--badge-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 0.85rem;
       cursor: pointer;
-      padding: 4px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
     }
 
-    /* 搜尋與下拉選單區塊 */
     .search-section {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 12px;
+      gap: 10px;
+      margin-top: 14px;
     }
 
     .search-row {
       display: flex;
-      gap: 8px;
+      gap: 10px;
+      flex-direction: column;
     }
 
     .search-input, .search-select {
       width: 100%;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border: 1px solid var(--border-color);
       border-radius: 10px;
       background-color: var(--bg-color);
       color: var(--text-main);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       outline: none;
     }
 
-    .search-input:focus, .search-select:focus {
-      border-color: var(--kmb-red);
+    .stop-manage-box {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-color);
+      flex-wrap: wrap;
     }
 
-    /* 巴士站快捷索引列 */
+    .btn-action {
+      background-color: var(--kmb-red);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     .stop-index-nav {
       display: flex;
-      gap: 6px;
-      margin-top: 10px;
+      gap: 8px;
+      margin-top: 12px;
       overflow-x: auto;
       padding-bottom: 4px;
       scrollbar-width: none;
     }
 
-    .stop-index-nav::-webkit-scrollbar {
-      display: none;
-    }
+    .stop-index-nav::-webkit-scrollbar { display: none; }
 
     .index-btn {
       background: var(--badge-bg);
       color: var(--badge-text);
       border: none;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 12px;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .index-btn:hover {
-      background: var(--kmb-red);
-      color: white;
-    }
-
-    /* 背景顏色選擇器 */
     .color-picker {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
-      margin-top: 10px;
-      padding-top: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1px dashed var(--border-color);
     }
 
-    .color-picker-label {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      margin-right: 4px;
-    }
+    .color-picker-label { font-size: 0.85rem; color: var(--text-sub); margin-right: 4px; }
 
     .color-dot {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
     }
 
     .color-dot.active { border-color: var(--kmb-red); }
+    .dot-dark { background-color: #121212; border: 1px solid #444; }
     .dot-gray { background-color: #f8f9fa; border: 1px solid #ccc; }
     .dot-blue { background-color: #eef2f7; }
     .dot-green { background-color: #eef7f2; }
@@ -181,35 +201,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 12px;
+      margin-top: 14px;
       font-size: 0.85rem;
       color: var(--text-sub);
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .btn-refresh {
-      background-color: var(--kmb-red);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .auto-refresh-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
+    .control-group { display: flex; align-items: center; gap: 12px; }
 
     .progress-bar-container {
       width: 100%;
       height: 3px;
       background: var(--border-color);
       border-radius: 2px;
-      margin-top: 12px;
+      margin-top: 14px;
       overflow: hidden;
     }
 
@@ -220,37 +226,94 @@
       transition: width 1s linear;
     }
 
+    .stops-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
     .stop-card {
       background: var(--card-bg);
       border-radius: 16px;
-      padding: 16px 20px;
-      margin-bottom: 16px;
+      padding: 20px;
       box-shadow: var(--shadow);
-      scroll-margin-top: 280px;
+      scroll-margin-top: 320px;
+      height: fit-content;
+      position: relative;
     }
 
+    /* 🔥 修正 1：對齊卡片標題列與按鈕 */
     .stop-header {
       border-left: 4px solid var(--kmb-red);
       padding-left: 10px;
       margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stop-title-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
     }
 
     .stop-name {
       font-size: 1.15rem;
       font-weight: 700;
-      display: block;
-    }
-
-    .stop-id {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-    }
-
-    .eta-list {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
+
+    .stop-id { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+
+    .stop-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* 🔥 修正 2：地圖與刪除按鈕防換行 */
+    .map-link {
+      color: #ffffff;
+      background: var(--kmb-red);
+      text-decoration: none;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .btn-delete-stop {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .btn-delete-stop:hover {
+      color: #ffffff;
+      background: #c62828;
+      border-color: #c62828;
+    }
+
+    .eta-list { display: flex; flex-direction: column; gap: 12px; }
 
     .eta-row {
       display: flex;
@@ -263,19 +326,12 @@
     .eta-row.is-fav {
       background-color: rgba(255, 215, 0, 0.08);
       border-radius: 8px;
-      padding: 6px 8px 12px 8px;
+      padding: 8px;
     }
 
-    .eta-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
+    .eta-row:last-child { border-bottom: none; padding-bottom: 0; }
 
-    .route-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .route-info { display: flex; align-items: center; gap: 8px; }
 
     .fav-btn {
       background: none;
@@ -285,11 +341,11 @@
       color: #ccc;
       padding: 0;
       line-height: 1;
+      display: flex;
+      align-items: center;
     }
 
-    .fav-btn.active {
-      color: var(--star-color);
-    }
+    .fav-btn.active { color: var(--star-color); }
 
     .route-badge {
       background-color: var(--badge-bg);
@@ -302,10 +358,7 @@
       text-align: center;
     }
 
-    .dest-name {
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
+    .dest-name { font-size: 0.95rem; font-weight: 600; }
 
     .eta-times-group {
       display: flex;
@@ -314,40 +367,38 @@
       gap: 4px;
     }
 
-    .eta-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .eta-item { display: flex; align-items: center; gap: 8px; }
 
     .eta-arrived {
       color: var(--kmb-red);
       font-weight: 800;
       font-size: 0.95rem;
       animation: blink 1.5s infinite;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .eta-coming {
-      color: #2e7d32;
+      color: #81c784;
       font-weight: 800;
       font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    body.dark-mode .eta-coming {
-      color: #81c784;
-    }
-
-    .eta-clock {
-      font-size: 0.75rem;
+    .eta-rmk {
+      font-size: 0.7rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
       color: var(--text-sub);
     }
 
-    .empty-state {
-      text-align: center;
-      color: var(--text-sub);
-      padding: 12px 0;
-      font-size: 0.9rem;
-    }
+    .eta-clock { font-size: 0.75rem; color: var(--text-sub); }
+
+    .empty-state { text-align: center; color: var(--text-sub); padding: 12px 0; font-size: 0.9rem; }
 
     .skeleton {
       background: linear-gradient(90deg, var(--border-color) 25%, var(--card-bg) 50%, var(--border-color) 75%);
@@ -357,65 +408,105 @@
       height: 20px;
     }
 
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @media (min-width: 768px) {
+      .search-row { flex-direction: row; }
+      .stops-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+    @media (min-width: 1024px) {
+      .stops-grid { grid-template-columns: repeat(3, 1fr); }
     }
   </style>
 </head>
-<body class="theme-gray">
+<body class="dark-mode">
 
   <div class="container">
     <header>
       <div class="header-top">
-        <h1>九巴即時到站預報</h1>
-        <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
+        <h1>🚌 九巴即時到站預報</h1>
+        <div class="header-actions">
+          <button class="btn-help" onclick="showHelp()">❓ 使用指南</button>
+          <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️ 淺色模式</button>
+        </div>
       </div>
 
-      <!-- 搜尋與下拉式選單列 -->
       <div class="search-section">
         <div class="search-row">
           <select class="search-select" id="route-select" onchange="handleSelectSearch(this.value)">
-            <option value="">-- 所有路線 (下拉選擇) --</option>
+            <option value="">🚌 -- 所有路線 (點擊下拉選擇) --</option>
           </select>
-          <input type="text" class="search-input" id="search-input" placeholder="搜尋路線或目的地..." oninput="handleTextSearch(this.value)">
+          <input type="text" class="search-input" id="search-input" placeholder="🔍 輸入路線或目的地搜尋..." oninput="handleTextSearch(this.value)">
+        </div>
+
+        <div class="stop-manage-box">
+          <select class="search-select" style="flex: 1;" onchange="addPresetStop(this.value); this.value='';">
+            <option value="">✨ 點擊快速新增熱門巴士站 (如荃灣、尖沙咀...)</option>
+            <option value="6B81EF180F396CDD">📍 荃灣站巴士總站</option>
+            <option value="9D325EE08BDDE3FE">📍 荃灣西站巴士總站</option>
+            <option value="31D1FF88C22370BF">📍 荃灣千色店</option>
+            <option value="0A1DAEAFFDFF0B66">📍 可風中學 (TW310)</option>
+            <option value="DEDD6247441C8C05">📍 可風中學 (TW496)</option>
+            <option value="97BB9CE7A058E809">📍 觀塘轉車站 - 創紀之城</option>
+          </select>
+          
+          <div style="display: flex; gap: 8px; flex: 1;">
+            <input type="text" class="search-input" id="new-stop-input" placeholder="或輸入自訂 KMB 站點 ID..." />
+            <button class="btn-action" onclick="addNewStop()">➕ 新增</button>
+          </div>
         </div>
       </div>
 
       <div class="stop-index-nav" id="stop-index-nav"></div>
 
       <div class="color-picker">
-        <span class="color-picker-label">背景：</span>
-        <div class="color-dot dot-gray active" onclick="setBgTheme('theme-gray', this)"></div>
-        <div class="color-dot dot-blue" onclick="setBgTheme('theme-blue', this)"></div>
-        <div class="color-dot dot-green" onclick="setBgTheme('theme-green', this)"></div>
-        <div class="color-dot dot-warm" onclick="setBgTheme('theme-warm', this)"></div>
-        <div class="color-dot dot-purple" onclick="setBgTheme('theme-purple', this)"></div>
+        <span class="color-picker-label">🎨 背景主題：</span>
+        <div class="color-dot dot-dark active" onclick="setBgTheme('dark-mode', this)" title="深色黑"></div>
+        <div class="color-dot dot-gray" onclick="setBgTheme('theme-gray', this)" title="極簡灰"></div>
+        <div class="color-dot dot-blue" onclick="setBgTheme('theme-blue', this)" title="冷溪藍"></div>
+        <div class="color-dot dot-green" onclick="setBgTheme('theme-green', this)" title="薄荷綠"></div>
+        <div class="color-dot dot-warm" onclick="setBgTheme('theme-warm', this)" title="溫暖橘"></div>
+        <div class="color-dot dot-purple" onclick="setBgTheme('theme-purple', this)" title="微醺紫"></div>
       </div>
 
       <div class="controls">
-        <button class="btn-refresh" onclick="handleManualRefresh()">立即更新</button>
-        <label class="auto-refresh-label">
-          <input type="checkbox" id="auto-toggle" checked onchange="toggleAutoRefresh()">
-          30秒自動更新
-        </label>
+        <div class="control-group">
+          <button class="btn-action" onclick="handleManualRefresh()">🔄 立即更新</button>
+          <label class="auto-refresh-label">
+            <input type="checkbox" id="auto-toggle" checked onchange="toggleAutoRefresh()">
+            ⏱️ 30秒自動倒數刷新
+          </label>
+        </div>
+        <div class="control-group">
+          <label class="auto-refresh-label" title="收藏的路線抵達前 3 分鐘會播放廣東話語音提醒">
+            <input type="checkbox" id="sound-toggle" checked>
+            🔊 到站語音提醒 (≤3分鐘)
+          </label>
+        </div>
       </div>
       <div class="progress-bar-container">
         <div class="progress-bar" id="progress-bar"></div>
       </div>
     </header>
 
-    <div id="stops-container"></div>
+    <div class="stops-grid" id="stops-container"></div>
   </div>
 
   <script>
-    const stopIds = [
-      '97BB9CE7A058E809',
+    // 🔥 修正 3：預設熱門車站中文名稱對照表 (當 API 回傳較慢或異常時備用)
+    const presetStopNames = {
+      '6B81EF180F396CDD': '荃灣站巴士總站',
+      '9D325EE08BDDE3FE': '荃灣西站巴士總站',
+      '31D1FF88C22370BF': '荃灣千色店',
+      '0A1DAEAFFDFF0B66': '可風中學 (TW310)',
+      'DEDD6247441C8C05': '可風中學 (TW496)',
+      '97BB9CE7A058E809': '觀塘轉車站 - 創紀之城'
+    };
+
+    let stopIds = JSON.parse(localStorage.getItem('kmb_stop_ids')) || [
+      '6B81EF180F396CDD',
       '0A1DAEAFFDFF0B66',
       'DEDD6247441C8C05'
     ];
@@ -423,11 +514,60 @@
     let countdownId = null;
     let secondsLeft = 30;
     let filterKeyword = '';
+    const announcedKeys = new Set();
 
     let favorites = JSON.parse(localStorage.getItem('kmb_fav_routes') || '[]');
 
+    function showHelp() {
+      alert(
+        "💡 九巴即時到站預報 — 功能使用指南：\n\n" +
+        "1. ★ 收藏路線：點擊路線旁的星號，可將路線『優先置頂』！\n" +
+        "2. 🔊 語音提醒：當已收藏的路線於 3 分鐘內到達時，會自動播放廣東話語音提醒。\n" +
+        "3. 📍 地圖定位：點擊巴士站名旁的『📍 地圖』，可直接開啓 Google 地圖查看該站位置。\n" +
+        "4. ✨ 快捷新增：可利用下拉選單快速新增荃灣、尖沙咀、旺角等熱門巴士站。\n" +
+        "5. 🎨 背景主題：點擊調色盤圓點，可隨時更換背景主題色彩。"
+      );
+    }
+
+    function saveStopIds() {
+      localStorage.setItem('kmb_stop_ids', JSON.stringify(stopIds));
+    }
+
     function saveFavorites() {
       localStorage.setItem('kmb_fav_routes', JSON.stringify(favorites));
+    }
+
+    function addPresetStop(stopId) {
+      if (!stopId) return;
+      if (stopIds.includes(stopId)) {
+        alert('該巴士站已在列表中！');
+        return;
+      }
+      stopIds.push(stopId);
+      saveStopIds();
+      renderAllStops();
+    }
+
+    function addNewStop() {
+      const input = document.getElementById('new-stop-input');
+      const newId = input.value.trim().toUpperCase();
+      if (!newId) return;
+      if (stopIds.includes(newId)) {
+        alert('該巴士站 ID 已存在列表中！');
+        return;
+      }
+      stopIds.push(newId);
+      saveStopIds();
+      input.value = '';
+      renderAllStops();
+    }
+
+    function deleteStop(stopId) {
+      if (confirm(`確定要移除此巴士站嗎？`)) {
+        stopIds = stopIds.filter(id => id !== stopId);
+        saveStopIds();
+        renderAllStops();
+      }
     }
 
     function toggleFavorite(favKey) {
@@ -441,19 +581,21 @@
     }
 
     function setBgTheme(themeName, element) {
-      document.body.classList.remove('theme-gray', 'theme-blue', 'theme-green', 'theme-warm', 'theme-purple');
+      document.body.classList.remove('theme-gray', 'theme-blue', 'theme-green', 'theme-warm', 'theme-purple', 'dark-mode');
       document.body.classList.add(themeName);
       document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
       if (element) element.classList.add('active');
+      
+      const isDark = document.body.classList.contains('dark-mode');
+      document.getElementById('theme-btn').innerHTML = isDark ? '☀️ 淺色模式' : '🌙 深色模式';
     }
 
     function toggleTheme() {
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
-      document.getElementById('theme-btn').innerText = isDark ? '☀️' : '🌙';
+      document.getElementById('theme-btn').innerHTML = isDark ? '☀️ 淺色模式' : '🌙 深色模式';
     }
 
-    // 處理搜尋過濾
     function handleSelectSearch(val) {
       document.getElementById('search-input').value = val;
       filterKeyword = val.trim().toUpperCase();
@@ -466,14 +608,38 @@
       renderAllStops();
     }
 
-    async function fetchStopName(stopId) {
+    function triggerArrivalAlert(route, dest) {
+      if (!document.getElementById('sound-toggle').checked) return;
+
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      } catch (e) {}
+
+      if ('speechSynthesis' in window) {
+        const text = `路線 ${route} 往 ${dest} 即將到達`;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-HK';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    async function fetchStopDetail(stopId) {
       try {
         const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop/${stopId}`);
         const json = await res.json();
-        return json.data ? json.data.name_tc : stopId;
-      } catch (err) {
-        return stopId;
-      }
+        if (json.data && json.data.name_tc) {
+          return json.data;
+        }
+      } catch (err) {}
+
+      // 備用站名機制
+      return { name_tc: presetStopNames[stopId] || `巴士站 (${stopId.substring(0, 6)})` };
     }
 
     async function fetchETA(stopId) {
@@ -514,12 +680,20 @@
       const allAvailableRoutes = new Set();
 
       for (const stopId of stopIds) {
-        const [stopName, etaData] = await Promise.all([
-          fetchStopName(stopId),
+        const [stopDetail, etaData] = await Promise.all([
+          fetchStopDetail(stopId),
           fetchETA(stopId)
         ]);
 
-        indexNavHtml += `<button class="index-btn" onclick="scrollToStop('${stopId}')">${stopName}</button>`;
+        const stopName = stopDetail.name_tc || stopId;
+        const lat = stopDetail.lat;
+        const long = stopDetail.long;
+        
+        const mapUrl = (lat && long) 
+          ? `https://www.google.com/maps/search/?api=1&query=${lat},${long}`
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(stopName)}`;
+
+        indexNavHtml += `<button class="index-btn" onclick="scrollToStop('${stopId}')">🚏 ${stopName}</button>`;
 
         const groupedEtas = {};
 
@@ -532,6 +706,7 @@
           const etaDate = new Date(item.eta);
           const diffMinutes = Math.round((etaDate - now) / 60000);
           const etaTime = etaDate.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit', hour12: false });
+          const rmk = item.rmk_tc || '';
 
           if (!groupedEtas[key]) {
             groupedEtas[key] = {
@@ -540,10 +715,9 @@
               times: []
             };
           }
-          groupedEtas[key].times.push({ diff: diffMinutes, etaTime });
+          groupedEtas[key].times.push({ diff: diffMinutes, etaTime, rmk });
         });
 
-        // 搜尋過濾邏輯（路線號碼或目的地）
         let sortedRoutes = Object.values(groupedEtas);
         if (filterKeyword) {
           sortedRoutes = sortedRoutes.filter(r => 
@@ -552,7 +726,6 @@
           );
         }
 
-        // 排序：收藏路線優先，其餘按時間排序
         sortedRoutes.sort((a, b) => {
           const keyA = `${stopId}_${a.route}_${a.dest}`;
           const keyB = `${stopId}_${b.route}_${b.dest}`;
@@ -569,7 +742,7 @@
 
         let rowsHtml = '';
         if (sortedRoutes.length === 0) {
-          rowsHtml = '<div class="empty-state">暫無符合條件的班次預報</div>';
+          rowsHtml = '<div class="empty-state">🚫 暫無符合條件的班次預報</div>';
         } else {
           rowsHtml = sortedRoutes.map(group => {
             const favKey = `${stopId}_${group.route}_${group.dest}`;
@@ -578,11 +751,23 @@
             const timesHtml = group.times
               .sort((a, b) => a.diff - b.diff)
               .map(t => {
+                if (isFav && t.diff <= 3 && t.diff >= 0) {
+                  const announceKey = `${favKey}_${t.etaTime}`;
+                  if (!announcedKeys.has(announceKey)) {
+                    triggerArrivalAlert(group.route, group.dest);
+                    announcedKeys.add(announceKey);
+                  }
+                }
+
                 const statusHtml = t.diff <= 0 
-                  ? `<span class="eta-arrived">即將到達</span>`
-                  : `<span class="eta-coming">${t.diff} <small style="font-size:0.75rem;">分</small></span>`;
+                  ? `<span class="eta-arrived">🚍 即將到達</span>`
+                  : `<span class="eta-coming">🚌 ${t.diff} <small style="font-size:0.75rem;">分</small></span>`;
+                
+                const rmkHtml = t.rmk ? `<span class="eta-rmk">${t.rmk}</span>` : '';
+
                 return `
                   <div class="eta-item">
+                    ${rmkHtml}
                     ${statusHtml}
                     <span class="eta-clock">(${t.etaTime})</span>
                   </div>
@@ -592,7 +777,7 @@
             return `
               <div class="eta-row ${isFav ? 'is-fav' : ''}">
                 <div class="route-info">
-                  <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${favKey}')">★</button>
+                  <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${favKey}')" title="收藏/取消收藏路線">★</button>
                   <span class="route-badge">${group.route}</span>
                   <span class="dest-name">往 ${group.dest}</span>
                 </div>
@@ -604,11 +789,18 @@
           }).join('');
         }
 
+        /* 🔥 修正 4：卡片頂部動作區域按鈕獨立包覆，防止文字斷行錯位 */
         htmlContent += `
           <div class="stop-card" id="stop-${stopId}">
             <div class="stop-header">
-              <span class="stop-name">${stopName}</span>
-              <span class="stop-id">站點 ID: ${stopId}</span>
+              <div class="stop-title-group">
+                <span class="stop-name">🚏 ${stopName}</span>
+                <span class="stop-id">站點 ID: ${stopId}</span>
+              </div>
+              <div class="stop-actions">
+                <a href="${mapUrl}" target="_blank" class="map-link" title="開啟 Google 地圖">📍 地圖</a>
+                <button class="btn-delete-stop" onclick="deleteStop('${stopId}')" title="移除此車站">🗑️ 移除</button>
+              </div>
             </div>
             <div class="eta-list">
               ${rowsHtml}
@@ -617,11 +809,10 @@
         `;
       }
 
-      // 動態更新下拉式選單選項
       const currentSelected = routeSelect.value;
       const sortedRouteList = Array.from(allAvailableRoutes).sort();
-      routeSelect.innerHTML = '<option value="">-- 所有路線 (下拉選擇) --</option>' + 
-        sortedRouteList.map(r => `<option value="${r}">${r} 號路線</option>`).join('');
+      routeSelect.innerHTML = '<option value="">🚌 -- 所有路線 (點擊下拉選擇) --</option>' + 
+        sortedRouteList.map(r => `<option value="${r}">🚌 ${r} 號路線</option>`).join('');
       routeSelect.value = currentSelected;
 
       indexNav.innerHTML = indexNavHtml;
