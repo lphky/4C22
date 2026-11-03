@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>九巴即時到站預報</title>
+  <style>
+    :root {
+      --kmb-red: #e53935;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #212529;
+      --text-sub: #6c757d;
+      --border-color: #f1f3f5;
+      --badge-bg: #f1f3f5;
+      --badge-text: #212529;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      --star-color: #ffd700;
+    }
+
+    body.theme-gray { --bg-color: #f8f9fa; }
+    body.theme-blue { --bg-color: #eef2f7; }
+    body.theme-green { --bg-color: #eef7f2; }
+    body.theme-warm { --bg-color: #fdf8f4; }
+    body.theme-purple { --bg-color: #f5f3f7; }
+
+    body.dark-mode {
+      --bg-color: #121212 !important;
+      --card-bg: #1e1e1e;
+      --text-main: #e0e0e0;
+      --text-sub: #a0a0a0;
+      --border-color: #2c2c2c;
+      --badge-bg: #2c2c2c;
+      --badge-text: #ffffff;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    header {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      color: var(--kmb-red);
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    /* 搜尋與下拉選單區塊 */
+    .search-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .search-input, .search-select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .search-input:focus, .search-select:focus {
+      border-color: var(--kmb-red);
+    }
+
+    /* 巴士站快捷索引列 */
+    .stop-index-nav {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .stop-index-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .index-btn {
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .index-btn:hover {
+      background: var(--kmb-red);
+      color: white;
+    }
+
+    /* 背景顏色選擇器 */
+    .color-picker {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .color-picker-label {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-right: 4px;
+    }
+
+    .color-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .color-dot.active { border-color: var(--kmb-red); }
+    .dot-gray { background-color: #f8f9fa; border: 1px solid #ccc; }
+    .dot-blue { background-color: #eef2f7; }
+    .dot-green { background-color: #eef7f2; }
+    .dot-warm { background-color: #fdf8f4; }
+    .dot-purple { background-color: #f5f3f7; }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .btn-refresh {
+      background-color: var(--kmb-red);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .auto-refresh-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 3px;
+      background: var(--border-color);
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: var(--kmb-red);
+      transition: width 1s linear;
+    }
+
+    .stop-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 280px;
+    }
+
+    .stop-header {
+      border-left: 4px solid var(--kmb-red);
+      padding-left: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stop-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: block;
+    }
+
+    .stop-id {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    .eta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .eta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .eta-row.is-fav {
+      background-color: rgba(255, 215, 0, 0.08);
+      border-radius: 8px;
+      padding: 6px 8px 12px 8px;
+    }
+
+    .eta-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .route-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fav-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #ccc;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .fav-btn.active {
+      color: var(--star-color);
+    }
+
+    .route-badge {
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 6px 10px;
+      border-radius: 8px;
+      min-width: 54px;
+      text-align: center;
+    }
+
+    .dest-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .eta-times-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .eta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eta-arrived {
+      color: var(--kmb-red);
+      font-weight: 800;
+      font-size: 0.95rem;
+      animation: blink 1.5s infinite;
+    }
+
+    .eta-coming {
+      color: #2e7d32;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    body.dark-mode .eta-coming {
+      color: #81c784;
+    }
+
+    .eta-clock {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-sub);
+      padding: 12px 0;
+      font-size: 0.9rem;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--border-color) 25%, var(--card-bg) 50%, var(--border-color) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 8px;
+      height: 20px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body class="theme-gray">
+
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <h1>九巴即時到站預報</h1>
+        <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
+      </div>
+
+      <!-- 搜尋與下拉式選單列 -->
+      <div class="search-section">
+        <div class="search-row">
+          <select class="search-select" id="route-select" onchange="handleSelectSearch(this.value)">
+            <option value="">-- 所有路線 (下拉選擇) --</option>
+          </select>
+          <input type="text" class="search-input" id="search-input" placeholder="搜尋路線或目的地..." oninput="handleTextSearch(this.value)">
+        </div>
+      </div>
+
+      <div class="stop-index-nav" id="stop-index-nav"></div>
+
+      <div class="color-picker">
+        <span class="color-picker-label">背景：</span>
+        <div class="color-dot dot-gray active" onclick="setBgTheme('theme-gray', this)"></div>
+        <div class="color-dot dot-blue" onclick="setBgTheme('theme-blue', this)"></div>
+        <div class="color-dot dot-green" onclick="setBgTheme('theme-green', this)"></div>
+        <div class="color-dot dot-warm" onclick="setBgTheme('theme-warm', this)"></div>
+        <div class="color-dot dot-purple" onclick="setBgTheme('theme-purple', this)"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-refresh" onclick="handleManualRefresh()">立即更新</button>
+        <label class="auto-refresh-label">
+          <input type="checkbox" id="auto-toggle" checked onchange="toggleAutoRefresh()">
+          30秒自動更新
+        </label>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </header>
+
+    <div id="stops-container"></div>
+  </div>
+
+  <script>
+    const stopIds = [
+      '97BB9CE7A058E809',
+      '0A1DAEAFFDFF0B66',
+      'DEDD6247441C8C05'
+    ];
+
+    let countdownId = null;
+    let secondsLeft = 30;
+    let filterKeyword = '';
+
+    let favorites = JSON.parse(localStorage.getItem('kmb_fav_routes') || '[]');
+
+    function saveFavorites() {
+      localStorage.setItem('kmb_fav_routes', JSON.stringify(favorites));
+    }
+
+    function toggleFavorite(favKey) {
+      if (favorites.includes(favKey)) {
+        favorites = favorites.filter(key => key !== favKey);
+      } else {
+        favorites.push(favKey);
+      }
+      saveFavorites();
+      renderAllStops();
+    }
+
+    function setBgTheme(themeName, element) {
+      document.body.classList.remove('theme-gray', 'theme-blue', 'theme-green', 'theme-warm', 'theme-purple');
+      document.body.classList.add(themeName);
+      document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+      if (element) element.classList.add('active');
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      document.getElementById('theme-btn').innerText = isDark ? '☀️' : '🌙';
+    }
+
+    // 處理搜尋過濾
+    function handleSelectSearch(val) {
+      document.getElementById('search-input').value = val;
+      filterKeyword = val.trim().toUpperCase();
+      renderAllStops();
+    }
+
+    function handleTextSearch(val) {
+      document.getElementById('route-select').value = '';
+      filterKeyword = val.trim().toUpperCase();
+      renderAllStops();
+    }
+
+    async function fetchStopName(stopId) {
+      try {
+        const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop/${stopId}`);
+        const json = await res.json();
+        return json.data ? json.data.name_tc : stopId;
+      } catch (err) {
+        return stopId;
+      }
+    }
+
+    async function fetchETA(stopId) {
+      try {
+        const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop-eta/${stopId}`);
+        const json = await res.json();
+        return json.data || [];
+      } catch (err) {
+        return [];
+      }
+    }
+
+    function scrollToStop(stopId) {
+      const target = document.getElementById(`stop-${stopId}`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function showSkeleton() {
+      const container = document.getElementById('stops-container');
+      container.innerHTML = stopIds.map(() => `
+        <div class="stop-card">
+          <div class="skeleton" style="width: 40%; margin-bottom: 12px;"></div>
+          <div class="skeleton" style="width: 100%; height: 40px;"></div>
+        </div>
+      `).join('');
+    }
+
+    async function renderAllStops() {
+      const container = document.getElementById('stops-container');
+      const indexNav = document.getElementById('stop-index-nav');
+      const routeSelect = document.getElementById('route-select');
+      
+      const now = new Date();
+      let htmlContent = '';
+      let indexNavHtml = '';
+      const allAvailableRoutes = new Set();
+
+      for (const stopId of stopIds) {
+        const [stopName, etaData] = await Promise.all([
+          fetchStopName(stopId),
+          fetchETA(stopId)
+        ]);
+
+        indexNavHtml += `<button class="index-btn" onclick="scrollToStop('${stopId}')">${stopName}</button>`;
+
+        const groupedEtas = {};
+
+        etaData.forEach(item => {
+          if (!item.eta) return;
+          
+          allAvailableRoutes.add(item.route);
+
+          const key = `${item.route}_${item.dest_tc}`;
+          const etaDate = new Date(item.eta);
+          const diffMinutes = Math.round((etaDate - now) / 60000);
+          const etaTime = etaDate.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+          if (!groupedEtas[key]) {
+            groupedEtas[key] = {
+              route: item.route,
+              dest: item.dest_tc || '未知',
+              times: []
+            };
+          }
+          groupedEtas[key].times.push({ diff: diffMinutes, etaTime });
+        });
+
+        // 搜尋過濾邏輯（路線號碼或目的地）
+        let sortedRoutes = Object.values(groupedEtas);
+        if (filterKeyword) {
+          sortedRoutes = sortedRoutes.filter(r => 
+            r.route.toUpperCase().includes(filterKeyword) || 
+            r.dest.toUpperCase().includes(filterKeyword)
+          );
+        }
+
+        // 排序：收藏路線優先，其餘按時間排序
+        sortedRoutes.sort((a, b) => {
+          const keyA = `${stopId}_${a.route}_${a.dest}`;
+          const keyB = `${stopId}_${b.route}_${b.dest}`;
+          const isFavA = favorites.includes(keyA);
+          const isFavB = favorites.includes(keyB);
+
+          if (isFavA && !isFavB) return -1;
+          if (!isFavA && isFavB) return 1;
+
+          const minA = Math.min(...a.times.map(t => t.diff));
+          const minB = Math.min(...b.times.map(t => t.diff));
+          return minA - minB;
+        });
+
+        let rowsHtml = '';
+        if (sortedRoutes.length === 0) {
+          rowsHtml = '<div class="empty-state">暫無符合條件的班次預報</div>';
+        } else {
+          rowsHtml = sortedRoutes.map(group => {
+            const favKey = `${stopId}_${group.route}_${group.dest}`;
+            const isFav = favorites.includes(favKey);
+
+            const timesHtml = group.times
+              .sort((a, b) => a.diff - b.diff)
+              .map(t => {
+                const statusHtml = t.diff <= 0 
+                  ? `<span class="eta-arrived">即將到達</span>`
+                  : `<span class="eta-coming">${t.diff} <small style="font-size:0.75rem;">分</small></span>`;
+                return `
+                  <div class="eta-item">
+                    ${statusHtml}
+                    <span class="eta-clock">(${t.etaTime})</span>
+                  </div>
+                `;
+              }).join('');
+
+            return `
+              <div class="eta-row ${isFav ? 'is-fav' : ''}">
+                <div class="route-info">
+                  <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${favKey}')">★</button>
+                  <span class="route-badge">${group.route}</span>
+                  <span class="dest-name">往 ${group.dest}</span>
+                </div>
+                <div class="eta-times-group">
+                  ${timesHtml}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        htmlContent += `
+          <div class="stop-card" id="stop-${stopId}">
+            <div class="stop-header">
+              <span class="stop-name">${stopName}</span>
+              <span class="stop-id">站點 ID: ${stopId}</span>
+            </div>
+            <div class="eta-list">
+              ${rowsHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      // 動態更新下拉式選單選項
+      const currentSelected = routeSelect.value;
+      const sortedRouteList = Array.from(allAvailableRoutes).sort();
+      routeSelect.innerHTML = '<option value="">-- 所有路線 (下拉選擇) --</option>' + 
+        sortedRouteList.map(r => `<option value="${r}">${r} 號路線</option>`).join('');
+      routeSelect.value = currentSelected;
+
+      indexNav.innerHTML = indexNavHtml;
+      container.innerHTML = htmlContent;
+      resetProgressBar();
+    }
+
+    function resetProgressBar() {
+      secondsLeft = 30;
+      updateProgressBar();
+    }
+
+    function updateProgressBar() {
+      const progressBar = document.getElementById('progress-bar');
+      const percentage = (secondsLeft / 30) * 100;
+      progressBar.style.width = `${percentage}%`;
+    }
+
+    function startAutoRefresh() {
+      stopAutoRefresh();
+      secondsLeft = 30;
+      
+      countdownId = setInterval(() => {
+        secondsLeft--;
+        updateProgressBar();
+        if (secondsLeft <= 0) {
+          renderAllStops();
+          secondsLeft = 30;
+        }
+      }, 1000);
+    }
+
+    function stopAutoRefresh() {
+      if (countdownId) clearInterval(countdownId);
+      document.getElementById('progress-bar').style.width = '0%';
+    }
+
+    function toggleAutoRefresh() {
+      const isChecked = document.getElementById('auto-toggle').checked;
+      if (isChecked) {
+        startAutoRefresh();
+      } else {
+        stopAutoRefresh();
+      }
+    }
+
+    function handleManualRefresh() {
+      renderAllStops();
+      if (document.getElementById('auto-toggle').checked) {
+        startAutoRefresh();
+      }
+    }
+
+    showSkeleton();
+    renderAllStops();
+    startAutoRefresh();
+  </script>
+</body>
+</html>
